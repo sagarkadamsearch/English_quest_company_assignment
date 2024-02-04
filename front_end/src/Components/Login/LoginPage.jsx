@@ -1,8 +1,53 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { set_Token_AND_Role } from '../../Redux/Auth/action';
+import { useSelector } from 'react-redux';
 
 const LoginPage = () => {
+    const token = useSelector((store)=> store.authReducer.token);
+    const [email,setEmail] = useState('');
+    const [password,setPassword] = useState('');
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const handleSubmit = (e)=>{
+       e.preventDefault();
+       const obj = {
+        email,
+        password
+       }
+       
+       if(!email || !password){
+        return alert('Please fill all fields');
+       }
+
+       
+       const url  = process.env.REACT_APP_Backend_Url;
+
+       axios.post(`${url}/login`,obj)
+       .then((res)=>{
+
+        alert(res.data.Msg);
+        setEmail('');
+        setPassword('');
+
+        if(res.data.token){
+            const token_role = {
+                token:res.data.token,
+                role:res.data.userData.role
+            }
+
+            dispatch(set_Token_AND_Role(token_role));
+            localStorage.setItem('UserData',JSON.stringify(token_role));
+            return navigate('/books');
+        }
+       })
+       .catch((error)=>console.log(error));
+    }
+
     return (
         <LoginSignupDiv className='loginSignupDiv'>
             <LoginForm className='loginForm'>
@@ -10,13 +55,13 @@ const LoginPage = () => {
                 <form className='form' action="">
                     <FormDiv>
                         <label htmlFor="email">Email:</label>        
-                        <input required id='email' name='email' type="text" placeholder='' />
+                        <input onChange={(e)=>setEmail(e.target.value)} value={email} required id='email' name='email' type="text" placeholder='' />
                     </FormDiv>
                     <FormDiv>
                         <label htmlFor="email">Password:</label>        
-                        <input required id='email' name='email' type="text" placeholder='' />
+                        <input onChange={(e)=>setPassword(e.target.value)} value={password} required id='email' name='email' type="text" placeholder='' />
                     </FormDiv>
-                    <button type='submit'>Login</button>
+                    <button type='submit' onClick={handleSubmit}>Login</button>
                 </form>
                 <div className='register'>
                    <p>Dont have an account?<Link to="/register"><span>Register</span></Link></p>
@@ -128,12 +173,18 @@ const LoginForm = styled.div`
     }
 
     button{
-        background-color: #656ED3;
-        border: none;
-        padding: 12px 0px;
-        border-radius: 100px;
-        margin-top: 30px;
-        color: white;
+            background-color: #656ED3;
+            border: none;
+            padding: 12px 0px;
+            border-radius: 100px;
+            margin-top: 20px;
+            color: white;
+        }
+
+    button:hover{
+        background-color: #747de1 ;
+        box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
+        cursor: pointer;
     }
 `
 

@@ -1,10 +1,9 @@
     import React, { useReducer, useRef } from 'react';
     import { shallowEqual, useDispatch, useSelector } from 'react-redux';
     import styled from 'styled-components'
-    import { handleRegisterEmail, handleRegisterName, handleRegisterPassword, handleRegisterRole } from '../../Redux/Register/action';
+    import { handleRegisterEmail, handleRegisterName, handleRegisterPassword, handleRegisterRole,handleRegisterReset } from '../../Redux/Register/action';
     import { Link } from 'react-router-dom';
-
-
+    import axios from 'axios';
 
 
     const Register = () => {
@@ -39,11 +38,16 @@
             dispatch(handleRegisterPassword(password));
         }
 
+        const handleReset = ()=>{
+            alert('Account created successfully')
+            dispatch(handleRegisterReset());
+        }
+
         const handleSubmit = (e)=>{
-       console.log(email,password)
-        const inputs = inputRefs.current
+          e.preventDefault();
+          const inputs = inputRefs.current
         
-        for(let i=0;i<inputs.length;i++){
+          for(let i=0;i<inputs.length;i++){
             const input = inputs[i];
 
             if (input.classList.contains('invalid') || input.value.trim() === '') {
@@ -52,9 +56,25 @@
             else{
                 inputRefs.current[i].classList.remove('sagar');
             }
-        }
-        console.log(inputRefs);
-       
+          }
+          
+          if(!email || !name || !password || !role){
+            return alert("Please fill all fields");
+          }
+          
+          const obj = {
+            name,
+            email,
+            password,
+            role
+          }
+
+          const url  = process.env.REACT_APP_Backend_Url;
+
+          axios.post(`${url}/register`,obj)
+          .then((res)=>handleReset())
+          .catch((error)=>console.log(error));
+          
         }
 
         return (
@@ -64,25 +84,25 @@
                     <form className='form' action="">
                         <FormDiv>
                             <label htmlFor="name">Name:</label>        
-                            <input  ref={(el) => (inputRefs.current[0] = el)}  onChange={handleName} id='name' type="text" />
+                            <input value={name} ref={(el) => (inputRefs.current[0] = el)}  onChange={handleName} id='name' type="text" />
                         </FormDiv>
                         <FormDiv>
                             <label htmlFor="email">Email:</label>        
-                            <input  required ref={(el) => (inputRefs.current[1] = el)}  onChange={handleEmail} id='email' type="email" />
+                            <input value={email} required ref={(el) => (inputRefs.current[1] = el)}  onChange={handleEmail} id='email' type="email" />
                         </FormDiv>
                         <FormDiv>
                             <label htmlFor="password">Password:</label>        
-                            <input  ref={(el) => (inputRefs.current[2] = el)}  onChange={handlePassword} id='password' type="text" />
+                            <input value={password}  ref={(el) => (inputRefs.current[2] = el)}  onChange={handlePassword} id='password' type="text" />
                         </FormDiv>
                         <CheckBoxDiv>
                             <label >Role:</label>  
                             <div  className='checkboxContainer' onChange={handleChange}>
                             <div className='checkbox'>      
-                                <input value='VIEW_ALL' name='role' type="radio" />
+                                <input checked={role==='VIEW_ALL'} value='VIEW_ALL' name='role' type="radio" />
                                 <p>User</p>
                             </div>
                             <div className='checkbox'>      
-                                <input value='CREATOR' name='role' type="radio" />
+                                <input checked={role==='CREATOR'} value='CREATOR' name='role' type="radio" />
                                 <p>Creator</p>
                             </div>
                             </div>   

@@ -1,4 +1,4 @@
-import { SET_EMAIL, SET_NAME, SET_PASSWORD, SET_ROLE } from "../actionTypes"
+import { HANDLE_REGISTER_RESET, SET_EMAIL, SET_NAME, SET_PASSWORD, SET_ROLE } from "../actionTypes"
 
 
 export const handleRegisterName = (payload)=>{
@@ -15,4 +15,8 @@ export const handleRegisterPassword = (payload)=>{
 
 export const handleRegisterRole = (payload)=>{
     return {type:SET_ROLE,payload}
+}
+
+export const handleRegisterReset = ()=>{
+    return {type:HANDLE_REGISTER_RESET}
 }
