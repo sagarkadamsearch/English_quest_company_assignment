@@ -13,6 +13,18 @@ const LoginPage = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+
+    const isValidEmail = (email) => {
+        // Regular expression for a simple email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      
+        // Additional checks (optional)
+        const isValidFormat = emailRegex.test(email);
+        const hasValidDomain = email.endsWith('.com'); // You can modify this condition based on your requirements
+      
+        return isValidFormat && hasValidDomain;
+      };
+
     const handleSubmit = (e)=>{
        e.preventDefault();
        const obj = {
@@ -20,10 +32,15 @@ const LoginPage = () => {
         password
        }
        
-       if(!email || !password){
+       if(!isValidEmail(email)){
+        return alert("Please enter a valid email address!")
+      }  
+
+       if(!password){
         return alert('Please fill all fields');
        }
 
+       
        
        const url  = process.env.REACT_APP_Backend_Url;
 

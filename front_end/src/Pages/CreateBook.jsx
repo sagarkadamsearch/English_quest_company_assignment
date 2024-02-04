@@ -42,12 +42,23 @@ const CreateBook = () => {
 
     const url  = process.env.REACT_APP_Backend_Url;
 
-    axios.post(`${url}/books/create/submit`,obj)
-    .then((res)=>alert(res.data.Msg))
-    .catch((error)=>{
-        alert("There is an error while create a book")
-        console.log(error)
+
+    fetch(`${url}/books/create/submit`,{
+        body:JSON.stringify(obj),
+        headers:{
+            "Content-Type":"Application/json",
+            'Authorization':`Bearer ${token}`
+        },
+        method:"POST"
     })
+     .then((res)=>res.json())
+     .then((data)=>{
+        alert(data.Msg);
+     })
+     .catch((error)=>{
+        alert("There is somthing wrong");
+        console.log(error);
+     })
   }
 
     return (
@@ -66,16 +77,20 @@ export default CreateBook;
 
 const DIV = styled.div`
    width: 400px;
-   border: 1px solid black;
+   /* border: 1px solid black; */
    margin: auto;
    margin-top: 100px;
    display: flex;
    flex-direction: column;
    align-items: flex-start;
    padding: 20px;
+   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+   padding-top: 50px;
+   padding-bottom: 50px;
 
    input,textarea{
-    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
     border: none;
     padding:10px;
     box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;

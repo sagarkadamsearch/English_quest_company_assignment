@@ -43,6 +43,17 @@
             dispatch(handleRegisterReset());
         }
 
+        const isValidEmail = (email) => {
+            // Regular expression for a simple email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          
+            // Additional checks (optional)
+            const isValidFormat = emailRegex.test(email);
+            const hasValidDomain = email.endsWith('.com'); // You can modify this condition based on your requirements
+          
+            return isValidFormat && hasValidDomain;
+          };
+
         const handleSubmit = (e)=>{
           e.preventDefault();
           const inputs = inputRefs.current
@@ -58,6 +69,10 @@
             }
           }
           
+          if(!isValidEmail(email)){
+            return alert("Please enter a valid email address!");
+          }
+
           if(!email || !name || !password || !role){
             return alert("Please fill all fields");
           }

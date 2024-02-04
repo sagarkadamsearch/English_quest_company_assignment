@@ -3,14 +3,15 @@ const { connection } = require('./db');
 const app = express();
 const cors= require('cors');
 const { UserRoute } = require('./Routes/user.route');
+const { BookRoute } = require('./Routes/book.route');
 
 require('dotenv').config();
 
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
 app.use('/',UserRoute);
-
-
+app.use('/books',BookRoute);
 
 
 app.listen(8080,async()=>{
