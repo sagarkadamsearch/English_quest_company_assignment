@@ -6,6 +6,7 @@ import { reset_Token_And_Role, set_Token_AND_Role } from '../../Redux/Auth/actio
 import Loader from '../Loader/Loader';
 import { CgProfile } from "react-icons/cg";
 
+
 const Navbar = () => {
     const dispatch = useDispatch();
     const data1 = localStorage.getItem('UserData');
@@ -13,6 +14,7 @@ const Navbar = () => {
     const role = useSelector((store)=>store.authReducer.role);
     const navigate = useNavigate();
     const [loader,setLoader] = useState(false);
+    const [profile,setProfile] = useState(false);
 
      useEffect(()=>{
         if(data1){
@@ -32,15 +34,43 @@ const Navbar = () => {
     return (
         <NAVBAR>
             {loader && <Loader/>}
-            <span>English Quest</span>
-            <Link className='linkStyle' to="/books"><p>Books</p></Link>
+            <span>
+                English Quest
+            </span>
+            <Link className='linkStyle' to="/books">
+                <p>Books</p>
+            </Link>
+
             {role=="CREATOR" && <Link className='linkStyle' to="books/create"><p>Create Book</p></Link>}
+
             <div className='buttonDiv'>
-               {!token && <Link className='linkStyle' to="/login"> <button className='login'>Login</button></Link>}
-               {token && <button onClick={handleLogout} className='logout'>Logout</button>}
-               {!token && <Link className='linkStyle' to="/register"><button className='register'> Register</button></Link>}
+               {!token && 
+               <Link className='linkStyle' to="/login"> 
+                    <button className='login'>
+                        Login
+                    </button>
+                </Link>
+                }
+
+               {token &&
+                  <button onClick={handleLogout} className='logout'>
+                    Logout
+                  </button>}
+
+               {!token && 
+                  <Link className='linkStyle' to="/register">
+                    <button className='register'>
+                       Register
+                    </button>
+                  </Link>
+                }
             </div>
-            {token && <div className='profile'><CgProfile size={35}/></div>}
+
+            {token && 
+              <div className='profile'>
+                <CgProfile size={35} onClick={()=>setProfile(!profile)} cursor='pointer' />
+              </div>
+            }
         </NAVBAR>
     );
 };

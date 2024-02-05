@@ -64,7 +64,9 @@ UserRoute.post('/login',async(req,res)=>{
             }
 
             const userData = {
-                role:user.role
+                role:user.role,
+                name:user.name,
+                email:user.email
             }
 
            const token =  jwt.sign(payload,"masai");

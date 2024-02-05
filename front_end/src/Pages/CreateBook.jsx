@@ -3,11 +3,13 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { styled } from 'styled-components';
+import Loader from '../Components/Loader/Loader';
 
 const CreateBook = () => {
     
     const [bookName,setBookName] = useState('');
     const [description,setDescription] = useState('');
+    const [loader,setLoader] = useState(false);
 
     const navigate = useNavigate();
     let userData = localStorage.getItem('UserData');
@@ -30,9 +32,10 @@ const CreateBook = () => {
       }
    },[token])
 
+
   const handleSubmit = ()=>{
     if(bookName=='' || description==''){
-        return;
+        return alert('Please fill all fields!');
      }
 
     const obj = {
@@ -40,9 +43,8 @@ const CreateBook = () => {
         description
     }
 
+    setLoader(true);
     const url  = process.env.REACT_APP_Backend_Url;
-
-
     fetch(`${url}/books/create/submit`,{
         body:JSON.stringify(obj),
         headers:{
@@ -53,9 +55,13 @@ const CreateBook = () => {
     })
      .then((res)=>res.json())
      .then((data)=>{
+        setLoader(false);
         alert(data.Msg);
+        setBookName('');
+        setDescription('');
      })
      .catch((error)=>{
+        setLoader(false);
         alert("There is somthing wrong");
         console.log(error);
      })
@@ -68,6 +74,7 @@ const CreateBook = () => {
           <label htmlFor="">Description:</label>
           <textarea onChange={(e)=>setDescription(e.target.value)} type="text" />
           <button onClick={handleSubmit}>Create</button>
+          {loader && <Loader/>}
         </DIV>
     );
 };
