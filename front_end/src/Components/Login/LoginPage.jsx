@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { set_Token_AND_Role } from '../../Redux/Auth/action';
 import { useSelector } from 'react-redux';
+import Loader from '../Loader/Loader';
 
 const LoginPage = () => {
     const token = useSelector((store)=> store.authReducer.token);
@@ -12,7 +13,7 @@ const LoginPage = () => {
     const [password,setPassword] = useState('');
     const dispatch = useDispatch();
     const navigate = useNavigate();
-
+    const [loader,setLoader] = useState(false);
 
     const isValidEmail = (email) => {
         // Regular expression for a simple email validation
@@ -39,14 +40,14 @@ const LoginPage = () => {
        if(!password){
         return alert('Please fill all fields');
        }
+       
+       setLoader(true);
 
-       
-       
        const url  = process.env.REACT_APP_Backend_Url;
 
        axios.post(`${url}/login`,obj)
        .then((res)=>{
-
+        setLoader(false);
         alert(res.data.Msg);
         setEmail('');
         setPassword('');
@@ -62,11 +63,16 @@ const LoginPage = () => {
             return navigate('/books');
         }
        })
-       .catch((error)=>console.log(error));
+       .catch((error)=>{
+        setLoader(false);
+        console.log(error)});
     }
+
+    
 
     return (
         <LoginSignupDiv className='loginSignupDiv'>
+           {loader && <Loader/>}
             <LoginForm className='loginForm'>
                 <p>Welcome Back!</p>
                 <form className='form' action="">

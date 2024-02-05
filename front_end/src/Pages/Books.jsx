@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { styled } from 'styled-components';
+import Loader from '../Components/Loader/Loader';
+import { Center } from '@chakra-ui/react';
 
 const Books = () => {
 
@@ -13,6 +15,7 @@ const Books = () => {
    const navigate = useNavigate();
    const role = useSelector((store)=>store.authReducer.role)
    const userData = localStorage.getItem('UserData');
+   const [loader,setLoader] = useState(false);
 
    let token  = null;
 
@@ -20,11 +23,10 @@ const Books = () => {
     token=JSON.parse(userData).token
     }
    
-   
- 
-
 
    const fetchBooks = ()=>{
+    setLoader(true);
+
     fetch(`${url}/books?${filter}=1`,{
         headers:{
             'Authorization':`Bearer ${token}`
@@ -32,11 +34,13 @@ const Books = () => {
     })
      .then((res)=>res.json())
      .then((data)=>{
+        setLoader(false);
         if(data?.books){
             setBooks(data.books);
         }
      })
      .catch((error)=>{
+        setLoader(false);
         alert("There is somthing wrong");
         console.log(error);
      })
@@ -45,6 +49,8 @@ const Books = () => {
 
    const handleDelete = (id)=>{
     
+    setLoader(true);
+
     fetch(`${url}/books/delete/${id}`,{
         headers:{
             'Authorization':`Bearer ${token}`
@@ -52,22 +58,24 @@ const Books = () => {
     })
      .then((res)=>res.json())
      .then((data)=>{
+        setLoader(false);
         alert(data.Msg);
         fetchBooks();
      })
      .catch((error)=>{
+        setLoader(false);
         alert("There is somthing wrong");
         console.log(error);
      })
     }
     
    useEffect(()=>{
-   
     if(!token){
        return navigate('/login')
     }
 
     fetchBooks();
+
     const obj = {}
 
     if(filter){
@@ -97,14 +105,16 @@ const Books = () => {
     }
 
     return (
-        <DIV>
-            <h1>Books Table</h1>
+        <DIV filter={filter}>
+            <h1 style={{textDecoration:"underline"}}>Books Table</h1>
              <div className='filterDiv'>
                 <p>Filter:</p>
-                <div onClick={()=>{setFilter((prev)=>'new');handleFilter()}}>New</div>
-                <div onClick={()=>{setFilter((prev)=>'old');handleFilter()}}>Old</div>
+                <div style={{border:"none",borderRadius:"8px"}} className='new' onClick={()=>{setFilter((prev)=>'new');handleFilter()}}>New</div>
+                <div style={{border:"none",borderRadius:"8px"}} className='old' onClick={()=>{setFilter((prev)=>'old');handleFilter()}}>Old</div>
+                <div style={{border:"none",borderRadius:"8px"}} className='all' onClick={()=>{setFilter((prev)=>'all');handleFilter()}}>All</div>
              </div>
             <div>
+                <div style={{fontSize:'large',fontWeight:"bold",marginBottom:"10px"}}>Total: {books.length}</div>
                 <table>
                     <thead>
                         <tr>
@@ -118,11 +128,11 @@ const Books = () => {
                        </tr>
                     </thead>
                     <tbody>
-                        {books && BookData}
+                        {books.length>0?BookData:<td style={{border:"none"}}></td>}
                     </tbody>
                 </table>
-
             </div>
+            {loader && <Loader/>}
         </DIV>
     );
 };
@@ -184,4 +194,14 @@ const DIV = styled.div`
    .filterDiv p{
     font-size: large;
    }
+
+
+   ${(props) =>
+ 
+        props.filter &&
+        `
+        .filterDiv .${props.filter} {
+            background: linear-gradient(45deg, #2ecc71, #f39c12);
+        }
+    `}
 `

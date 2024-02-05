@@ -1,8 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { styled } from 'styled-components';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { reset_Token_And_Role, set_Token_AND_Role } from '../../Redux/Auth/action';
+import Loader from '../Loader/Loader';
+import { CgProfile } from "react-icons/cg";
 
 const Navbar = () => {
     const dispatch = useDispatch();
@@ -10,6 +12,7 @@ const Navbar = () => {
     const token = useSelector((store)=>store.authReducer.token);
     const role = useSelector((store)=>store.authReducer.role);
     const navigate = useNavigate();
+    const [loader,setLoader] = useState(false);
 
      useEffect(()=>{
         if(data1){
@@ -19,20 +22,25 @@ const Navbar = () => {
 
    
      const handleLogout = ()=>{
+       setLoader(true); 
        dispatch(reset_Token_And_Role());
        localStorage.removeItem('UserData');
+       setLoader(false);
        return navigate('/login')
     }
 
     return (
         <NAVBAR>
+            {loader && <Loader/>}
+            <span>English Quest</span>
             <Link className='linkStyle' to="/books"><p>Books</p></Link>
             {role=="CREATOR" && <Link className='linkStyle' to="books/create"><p>Create Book</p></Link>}
             <div className='buttonDiv'>
-            {!token && <Link className='linkStyle' to="/login"> <button className='login'>Login</button></Link>}
-            {token && <button onClick={handleLogout} className='logout'>Logout</button>}
-            {!token && <Link className='linkStyle' to="/register"><button className='register'> Register</button></Link>}
+               {!token && <Link className='linkStyle' to="/login"> <button className='login'>Login</button></Link>}
+               {token && <button onClick={handleLogout} className='logout'>Logout</button>}
+               {!token && <Link className='linkStyle' to="/register"><button className='register'> Register</button></Link>}
             </div>
+            {token && <div className='profile'><CgProfile size={35}/></div>}
         </NAVBAR>
     );
 };
@@ -41,14 +49,15 @@ export default Navbar;
 
 
 const NAVBAR = styled.div`
-   background-color: #9FA9D3;
-   padding-top : 10px;
-   padding-bottom: 10px;
+   background-color: #acb6da;
+   padding-top : 3px;
+   padding-bottom: 3px;
    color: #fff;
    display: flex;
    gap: 20px;
    justify-content: center;
    align-items: center;
+   position: relative;
 
     button{
         width: 100px;
@@ -100,4 +109,21 @@ const NAVBAR = styled.div`
      color: black;
     }
 
+   span{
+     font-size: xx-large;
+      position: absolute;
+      font-weight: 900;
+      left: 30px;
+   }
+
+   @media all and (max-width: 1000px){
+    justify-content: flex-end;
+    span{
+        font-size: 4vw;
+    }
+   }
+
+   .profile{
+
+   }
 `
