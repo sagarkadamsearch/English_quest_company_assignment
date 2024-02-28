@@ -2,6 +2,7 @@
   text-align: center;
   background-color: #EBEFFF;
   min-height: 100vh;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .App-logo {

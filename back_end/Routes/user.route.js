@@ -13,7 +13,7 @@ UserRoute.post('/register', async (req, res) => {
         const userPresent = await UserModel.findOne({ email });
 
         if (userPresent !== null) {
-            return res.status(409).json({ "error": "User already exists in the system" });
+            return res.status(200).json({ "Msg": "User already exists in the system" });
         }
 
         if (!name || !email || !password || !role) {
@@ -29,7 +29,7 @@ UserRoute.post('/register', async (req, res) => {
         const newUser = new UserModel({ ...req.body, password: hashedPassword });
         await newUser.save();
 
-        return res.status(201).json({ "message": "User account created successfully" });
+        return res.status(201).json({ "Msg": "User account created successfully" });
     } catch (error) {
         console.error("Error during user registration:", error);
         res.status(500).json({ "error": "Internal server error" });
@@ -52,25 +52,27 @@ UserRoute.post('/login',async(req,res)=>{
         }
 
         bcrypt.compare(password,user.password,(err,result)=>{
-            if(err){
-                return res.status(200).send({"Msg":"Please enter valid creditionals"});
-            }
 
-            const payload = {
-                userID:user._id,
-                name:user.name,
-                email:user.email,
-                role:user.role
+            if(result){
+                const payload = {
+                    userID:user._id,
+                    name:user.name,
+                    email:user.email,
+                    role:user.role
+                }
+    
+                const userData = {
+                    role:user.role,
+                    name:user.name,
+                    email:user.email
+                }
+    
+               const token =  jwt.sign(payload,"masai");
+               return res.status(200).json({"Msg":"Login Successful!",token:token,userData})
             }
-
-            const userData = {
-                role:user.role,
-                name:user.name,
-                email:user.email
-            }
-
-           const token =  jwt.sign(payload,"masai");
-           return res.status(200).json({"Msg":"Login Successful",token:token,userData})
+            else{
+                return res.status(200).send({"Msg":"Please enter valid creditionals!"});
+            }    
         });
 
     } catch (error) {

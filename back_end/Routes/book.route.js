@@ -1,8 +1,6 @@
 const express = require('express');
 const BookRoute = express.Router();
 const {BookModel} = require('../models/book.model');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const { Auth } = require('../middlewares/Auth');
 
 
@@ -25,24 +23,27 @@ BookRoute.post('/create/submit',Auth,async(req,res)=>{
 
 BookRoute.get('/',Auth,async(req,res)=>{
     const {role} = req.body;
-    const { new:isNew, old } = req.query;
+    const { new:isNew, old,page } = req.query;
     const tenMinutesAgo = new Date();
     tenMinutesAgo.setMinutes(tenMinutesAgo.getMinutes() - 10);
 
     try{
+       
+      let obj = {};
 
       if(isNew){
-        const books = await BookModel.find({ created_at: { $gte: tenMinutesAgo } });
-        return res.status(200).json({"books":books});
+        obj.created_at= { $gte: tenMinutesAgo }
       }  
 
       if(old){
-        const books = await BookModel.find({ created_at: { $lte: tenMinutesAgo } });
-        return res.status(200).json({"books":books});
+        obj.created_at= { $lte: tenMinutesAgo }
       }
-
-      const books = await BookModel.find();
-      res.status(200).json({"books":books});
+   
+      const limit = 5;
+      const books = await BookModel.find(obj).skip((page-1)*limit).limit(limit);
+      const booksTotalCount = await BookModel.find(obj).count();
+      const pages = Math.ceil(booksTotalCount/limit);
+      res.status(200).json({"books":books,"total":booksTotalCount,"pages":pages});
     }
     catch(error){
         res.status(400).json({"error":error});

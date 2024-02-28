@@ -1,6 +1,4 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { styled } from 'styled-components';
 import Loader from '../Components/Loader/Loader';
@@ -70,9 +68,9 @@ const CreateBook = () => {
     return (
         <DIV>
           <label htmlFor="">Book name:</label>
-          <input onChange={(e)=>setBookName(e.target.value)} type="text" />
+          <input onChange={(e)=>setBookName(e.target.value)} type="text" value={bookName}/>
           <label htmlFor="">Description:</label>
-          <textarea onChange={(e)=>setDescription(e.target.value)} type="text" />
+          <textarea onChange={(e)=>setDescription(e.target.value)} type="text" value={description}/>
           <button onClick={handleSubmit}>Create</button>
           {loader && <Loader/>}
         </DIV>

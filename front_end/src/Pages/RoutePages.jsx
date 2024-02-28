@@ -11,8 +11,9 @@ const RoutePages = () => {
             <Route path='/login' element={<LoginPage/>}/>
             <Route path='/register' element={<Register/>}/>
             <Route path='/books' element={<Books/>}/>
+            <Route path='/' element={<Books/>}/>
             <Route path='books/create' element={<CreateBook/>}/>
-            <Route path='*' element={<h1>You are not authorize to access this page</h1>}/>
+            <Route path='*' element={<h1>Page not found!</h1>}/>
         </Routes>
     );
 };

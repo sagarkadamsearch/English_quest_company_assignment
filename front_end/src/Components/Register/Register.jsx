@@ -1,16 +1,17 @@
-    import React, { useReducer, useRef } from 'react';
+    import React, { useReducer, useRef, useState } from 'react';
     import { shallowEqual, useDispatch, useSelector } from 'react-redux';
     import styled from 'styled-components'
     import { handleRegisterEmail, handleRegisterName, handleRegisterPassword, handleRegisterRole,handleRegisterReset } from '../../Redux/Register/action';
     import { Link } from 'react-router-dom';
     import axios from 'axios';
-
+    import Loader from '../Loader/Loader';
 
     const Register = () => {
         const inputRefs = useRef([]);
-
+        const [loader,setLoader] = useState(false);
 
         const dispatch = useDispatch();
+
         const {name,email,password,role} = useSelector((store)=>({
             name:store.registerReducer.name,
             email:store.registerReducer.email,
@@ -29,7 +30,7 @@
         }
 
         const handleEmail = (e)=>{
-            const email = e.target.value;
+            const email = e.target.value.toLowerCase();
             dispatch(handleRegisterEmail(email))
         }
 
@@ -39,17 +40,15 @@
         }
 
         const handleReset = ()=>{
-            alert('Account created successfully')
             dispatch(handleRegisterReset());
         }
 
         const isValidEmail = (email) => {
-            // Regular expression for a simple email validation
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
           
-            // Additional checks (optional)
+         
             const isValidFormat = emailRegex.test(email);
-            const hasValidDomain = email.endsWith('.com'); // You can modify this condition based on your requirements
+            const hasValidDomain = email.endsWith('.com');
           
             return isValidFormat && hasValidDomain;
           };
@@ -68,13 +67,13 @@
                 inputRefs.current[i].classList.remove('sagar');
             }
           }
-          
-          if(!isValidEmail(email)){
-            return alert("Please enter a valid email address!");
-          }
 
           if(!email || !name || !password || !role){
             return alert("Please fill all fields");
+          }
+          
+          if(!isValidEmail(email)){
+            return alert("Please enter a valid email address!");
           }
           
           const obj = {
@@ -86,9 +85,19 @@
 
           const url  = process.env.REACT_APP_Backend_Url;
 
+          setLoader(true);
+
           axios.post(`${url}/register`,obj)
-          .then((res)=>handleReset())
-          .catch((error)=>console.log(error));
+          .then((res)=>{
+            setLoader(false); 
+            alert(res.data.Msg);           
+            handleReset()
+          })
+          .catch((error)=>{
+            setLoader(false);
+            alert('An error occurred');
+            console.log(error)
+           });
           
         }
 
@@ -113,7 +122,7 @@
                             <label >Role:</label>  
                             <div  className='checkboxContainer' onChange={handleChange}>
                             <div className='checkbox'>      
-                                <input checked={role==='VIEW_ALL'} value='VIEW_ALL' name='role' type="radio" />
+                                <input checked={role==='VIEW_ALL'} value='VIEW_ALL' name='role' type="radio"/>
                                 <p>User</p>
                             </div>
                             <div className='checkbox'>      
@@ -137,6 +146,7 @@
                 <div className='sideDiv'>
                     <img src="https://nubot.ai/wp-content/uploads/2022/11/Imagen-4-Laptop-Deployment.png" alt="" />
                 </div>
+                {loader && <Loader/>}
             </LoginSignupDiv>
         );
     };
@@ -238,6 +248,8 @@
             border-radius: 100px;
             margin-top: 20px;
             color: white;
+            font-size: 15px;
+            font-weight: 500;
         }
 
     button:hover{
@@ -294,7 +306,12 @@ input.sagar{
         .checkbox{
             display: flex;
         }
-
+        .checkbox input{
+            cursor: pointer;
+        }
+        .checkbox p{
+            cursor: default;
+        }
         .checkboxContainer{
             display: flex;
             gap: 15px;

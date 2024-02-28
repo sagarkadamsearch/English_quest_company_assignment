@@ -78,7 +78,7 @@ const LoginPage = () => {
                 <form className='form' action="">
                     <FormDiv>
                         <label htmlFor="email">Email:</label>        
-                        <input onChange={(e)=>setEmail(e.target.value)} value={email} required id='email' name='email' type="text" placeholder='' />
+                        <input onChange={(e)=>setEmail(e.target.value.toLowerCase())} value={email} required id='email' name='email' type="text" placeholder='' />
                     </FormDiv>
                     <FormDiv>
                         <label htmlFor="email">Password:</label>        
